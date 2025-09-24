@@ -73,7 +73,10 @@ export function ToDoServ() {
         case ADD:
           const
             text = (ref.current! as HTMLInputElement).value,
-            item = new Item(text),
+            item = new Item(text);
+          delete item.id; // в качестве демонстрации различия optimisticData и результата вызова mutatorCallback()
+          const
+            optimisticData = (data)=> [...data, item],
             add = async () => {
               const
                 resp = await fetch(endpoint + '', {
@@ -87,16 +90,28 @@ export function ToDoServ() {
                 throw new Error('err:' + resp.status);
               const
                 result = await resp.json();
+              if (!result?.id)
+                throw new Error('err: ');
               return result;
             },
-            promise = add();
-          toast.promise(promise, {
-            loading: 'Adding',
-            success: 'Ok',
-            error: 'Error add item',
-          }, INFO_TOAST_OPTIONS);
-          await promise;
-          mutate();
+            // promise = add(),
+            mutatorCallback = async () => {
+              try {
+                const
+                  item = await add();
+                return [...data!, Item.from(item)];
+              } catch {
+                toast.error('Error add item'); // важно информировать пользователя OPTIMISTIC UI 
+                return [...data!];
+              }
+            };
+          mutate(mutatorCallback, { optimisticData, revalidate: true });
+          // toast.promise(promise, {
+          //   loading: 'Adding',
+          //   success: 'Ok',
+          //   error: 'Error add item',
+          // }, INFO_TOAST_OPTIONS);
+
           return;
 
         case DEL:
@@ -146,5 +161,6 @@ function ToDoItem({ item }: { item: Item }) {
     </label>
     {item.checked && '✔'}
     <button data-action={DEL} > ❌</button>
+    {item?.id}
   </li>
 }
