@@ -2,12 +2,23 @@
 
 import { type MouseEventHandler, useRef } from 'react';
 import useSWR from 'swr';
+import toast, { type ToastOptions } from 'react-hot-toast';
 
 const
   endpoint = 'http://localhost:3333/todo',
   ADD = 'add',
   DEL = 'del',
-  TOGGLE = 'toggle';
+  TOGGLE = 'toggle',
+
+  DEBUG_TOAST_OPTIONS: ToastOptions = {
+    icon: '👓',
+    position: 'bottom-right',
+    style: { fontSize: 'xx-small' }
+  },
+  INFO_TOAST_OPTIONS: ToastOptions = {
+    icon: 'ℹ'
+  };
+
 
 
 
@@ -62,14 +73,29 @@ export function ToDoServ() {
         case ADD:
           const
             text = (ref.current! as HTMLInputElement).value,
-            item = new Item(text);
-          await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
+            item = new Item(text),
+            add = async () => {
+              const
+                resp = await fetch(endpoint + '', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(item)
+                });
+              if (!resp.ok)
+                throw new Error('err:' + resp.status);
+              const
+                result = await resp.json();
+              return result;
             },
-            body: JSON.stringify(item)
-          });
+            promise = add();
+          toast.promise(promise, {
+            loading: 'Adding',
+            success: 'Ok',
+            error: 'Error add item',
+          }, INFO_TOAST_OPTIONS);
+          await promise;
           mutate();
           return;
 
