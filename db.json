@@ -1,49 +1,5 @@
 {
   "todo": [
-    {
-      "checked": false,
-      "text": "1111111111111",
-      "id": 1
-    },
-    {
-      "checked": false,
-      "text": "555555",
-      "id": 2
-    },
-    {
-      "checked": true,
-      "text": "77777777777",
-      "id": 3
-    },
-    {
-      "checked": false,
-      "text": "ккккккккк",
-      "id": 4
-    },
-    {
-      "checked": false,
-      "text": "66666666666",
-      "id": 5
-    },
-    {
-      "checked": false,
-      "text": "66666666666",
-      "id": 6
-    },
-    {
-      "checked": false,
-      "text": "66666666666",
-      "id": 7
-    },
-    {
-      "checked": false,
-      "text": "66666666666",
-      "id": 8
-    },
-    {
-      "checked": false,
-      "text": "66666666666",
-      "id": 9
-    }
-  ]
+    
+    ]
 }

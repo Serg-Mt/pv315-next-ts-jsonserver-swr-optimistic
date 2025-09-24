@@ -1,7 +1,7 @@
 'use client';
 
 import { type MouseEventHandler, useRef } from 'react';
-import useSWR from 'swr';
+import useSWR, { MutatorOptions, MutatorCallback } from 'swr';
 import toast, { type ToastOptions } from 'react-hot-toast';
 
 const
@@ -29,7 +29,7 @@ type NonFunctionPropertyNames<T> = {
 type NonFunctionProperties<T> = Pick<T, NonFunctionPropertyNames<T>>;
 
 class Item {
-  id = Math.random();
+  id? = Math.random();
   checked = false;
   text = '-default-';
 
@@ -74,17 +74,22 @@ export function ToDoServ() {
           const
             text = (ref.current! as HTMLInputElement).value,
             item = new Item(text);
-          delete item.id; // в качестве демонстрации различия optimisticData и результата вызова mutatorCallback()
+
           const
-            optimisticData = (data)=> [...data, item],
+            optimisticData: MutatorOptions<Item[]>['optimisticData']
+              = (_?, data?) => [...data!, item],
+
             add = async () => {
+              const
+                itemClient = Item.from(item);
+              delete itemClient.id; // в качестве демонстрации различия optimisticData и результата вызова mutatorCallback()
               const
                 resp = await fetch(endpoint + '', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
                   },
-                  body: JSON.stringify(item)
+                  body: JSON.stringify(itemClient)
                 });
               if (!resp.ok)
                 throw new Error('err:' + resp.status);
@@ -95,17 +100,17 @@ export function ToDoServ() {
               return result;
             },
             // promise = add(),
-            mutatorCallback = async () => {
+            mutatorCallback: MutatorCallback<Item[]> = async data => {
               try {
                 const
-                  item = await add();
-                return [...data!, Item.from(item)];
+                  itemFromServer = await add();
+                return [...data!, Item.from(itemFromServer)];
               } catch {
                 toast.error('Error add item'); // важно информировать пользователя OPTIMISTIC UI 
                 return [...data!];
               }
             };
-          mutate(mutatorCallback, { optimisticData, revalidate: true });
+          mutate(mutatorCallback, { optimisticData, revalidate: false });
           // toast.promise(promise, {
           //   loading: 'Adding',
           //   success: 'Ok',
