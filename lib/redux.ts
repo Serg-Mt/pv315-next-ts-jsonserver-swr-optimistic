@@ -52,21 +52,14 @@ function rootReducer(
     case DECREMENT:
       return { ...state, value: state.value - 1 };
     case ADD_ITEM:
-      return { ...state, todoList: [...state.todoList, { id: Math.random(), text: action.text, checked: false }] }
-    case DEL_ITEM:
-      return { ...state, todoList: state.todoList.filter(el => el.id !== action.id) };
-
-    case DECREMENT:
-      return { ...state, value: state.value - 1 };
-    case ADD_ITEM:
-      return { ...state, todoList: [...state.todoList, Object.assign({}, new Item(action.text))] }
+      return { ...state, todoList: [...state.todoList, new Item(action.text)] }
     case DEL_ITEM:
       return { ...state, todoList: state.todoList.filter(el => el.id !== action.id) };
     case TOGGLE_ITEM:
       const
         index = state.todoList.findIndex(el => el.id === action.id),
         el = state.todoList[index],
-        value = Item.from(el).toggleCheck();
+        value = el.toggleCheck();
       console.log({ index, el, value });
       return { ...state, todoList: state.todoList.with(index, value) }
     default:
