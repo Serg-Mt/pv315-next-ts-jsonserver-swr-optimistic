@@ -19,16 +19,13 @@ const
     icon: 'ℹ'
   };
 
-
-
-
 type NonFunctionPropertyNames<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 type NonFunctionProperties<T> = Pick<T, NonFunctionPropertyNames<T>>;
 
-class Item {
+export class Item {
   id? = Math.random();
   checked = false;
   text = '-default-';
@@ -54,11 +51,11 @@ async function fetcher(url: string | URL) {
 }
 
 
-
 export function ToDoServ() {
   const
     ref = useRef(null),
-    { data, error, isLoading, isValidating, mutate } = useSWR<Item[]>(endpoint, fetcher),
+    { data, error, isLoading, isValidating, mutate }
+      = useSWR<Item[]>(endpoint, fetcher),
     onClick: MouseEventHandler = async (event) => {
       const
         { target } = event,
@@ -96,11 +93,12 @@ export function ToDoServ() {
               const
                 result = await resp.json();
               if (!result?.id)
-                throw new Error('err: ');
-              return result;
+                throw new Error('bad data ');
+              return result as Item;
             },
             // promise = add(),
-            mutatorCallback: MutatorCallback<Item[]> = async data => {
+            mutatorCallback: MutatorCallback<Item[]> = async (data, ...rest) => {
+              console.log('mutatorCallback', { ...data, ...rest });
               try {
                 const
                   itemFromServer = await add();
@@ -109,7 +107,12 @@ export function ToDoServ() {
                 toast.error('Error add item'); // важно информировать пользователя OPTIMISTIC UI 
                 return [...data!];
               }
-            };
+            }
+          // populateCache = (...param) => {
+          //   console.log('populateCache', ...param)
+          //   return [new Item('ops')];
+          // }
+          console.log('mutate');
           mutate(mutatorCallback, { optimisticData, revalidate: false });
           // toast.promise(promise, {
           //   loading: 'Adding',
@@ -144,7 +147,7 @@ export function ToDoServ() {
     <h1>To Do List</h1>
     <section onClick={onClick} className=''>
       <label>
-        <input className="border" ref={ref} />
+        <input className="" ref={ref} />
         <button className="" data-action={ADD}>add</button>
       </label>
       {error && <div className="error">ERROR:</div>}
