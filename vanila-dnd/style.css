@@ -1,0 +1,36 @@
+main {
+  user-select: none;
+  display: flex;
+  gap: 10px;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 1px solid blue; */
+}
+
+.target {
+  min-width: 100px;
+  min-height: 100px;
+  background-color: skyblue;
+}
+
+.round {
+  min-width: 30px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  background-color: blueviolet;
+  color: white;
+}
+
+.dragging {
+  background-color: darkslateblue;
+}
+
+.active {
+  background-color: lightcyan;
+}

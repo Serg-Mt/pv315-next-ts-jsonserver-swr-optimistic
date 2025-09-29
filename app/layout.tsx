@@ -5,7 +5,8 @@ import { Toaster } from 'react-hot-toast'
 const links = [
   { href: '/', label: 'home' },
   { href: '/todo-serv', label: 'optimistic UI' },
-  { href: '/state-mngr', label: 'state managers' }
+  { href: '/state-mngr', label: 'state managers' },
+  { href: '/dnd', label: 'drag and drop' }
 ]
 
 export default function RootLayout({
